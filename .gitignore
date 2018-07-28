@@ -1,0 +1,8 @@
+# Basic Ignore Stuff
+build/
+.vs/
+*.exe
+
+# Epoxy Stuff
+*_generated.h
+*_generated_dispatch.c
