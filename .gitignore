@@ -6,3 +6,4 @@ build/
 # Epoxy Stuff
 *_generated.h
 *_generated_dispatch.c
+src/epoxy/src/config\.h
