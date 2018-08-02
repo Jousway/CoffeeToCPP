@@ -1,7 +1,10 @@
 # Basic Ignore Stuff
 build/
 .vs/
+
+# The program
 *.exe
+CoffeeToCPP
 
 # Epoxy Stuff
 *_generated.h
