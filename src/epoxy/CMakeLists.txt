@@ -3,12 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 find_package(OpenGL)
 find_package(X11)
 
-set (GLU_NAMES ${GLU_NAMES} GLU MesaGLU)
-find_library (GLU_LIBRARY NAMES ${GLU_NAMES} PATHS /usr/include/GL /usr/lib/x86_64-linux-gnu)
-
-set (EGL_NAMES ${EGL_NAMES} egl EGL libEGL)
-find_library (EGL_LIBRARY NAMES ${EGL_NAMES} PATHS /usr/include/GL /usr/lib/x86_64-linux-gnu)
-
 set (EPOXY_APIS gl egl wgl glx)
 set (EPOXY_GENERATED_FILES "")
 find_package(PythonInterp)
@@ -21,10 +15,6 @@ if(PYTHONINTERP_FOUND)
     endforeach ()
 else()
     message(FATAL_ERROR "System Python not found! install the library, then try again.")
-endif()
-
-if(EGL_LIBRARY)
-	set(ENABLE_EGL "1")
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.in.h" "${CMAKE_CURRENT_SOURCE_DIR}/src/config.h" @ONLY)
@@ -42,21 +32,6 @@ if(OPENGL_FOUND)
 		set(EPOXY_PLATFORM_SPECIFIC ${EPOXY_PLATFORM_SPECIFIC}
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/wgl_generated_dispatch.c"
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/dispatch_wgl.c")
-	endif()
-	
-	if(GLU_LIBRARY)
-		if(UNIX AND NOT APPLE)
-			message("-- GLU and Linux found, Using GLU")
-			set(EPOXY_INCLUDED_LIBS ${EPOXY_INCLUDED_LIBS} ${GLU_LIBRARY})
-		endif()
-	endif()
-	
-	if(EGL_LIBRARY)
-		message("-- epoxy Found EGL")
-		set(EPOXY_PLATFORM_SPECIFIC ${EPOXY_PLATFORM_SPECIFIC}
-		"${CMAKE_CURRENT_SOURCE_DIR}/src/egl_generated_dispatch.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/src/dispatch_egl.c")
-		set(EPOXY_INCLUDED_LIBS ${EPOXY_INCLUDED_LIBS} ${EGL_LIBRARY})
 	endif()
 
 	if(X11_FOUND)

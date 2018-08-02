@@ -33,8 +33,6 @@
 extern "C" {
 #endif
 
-#cmakedefine ENABLE_EGL "@ENABLE_EGL@"
-
 #ifdef _WIN32
 #  include <windows.h>
 //#  define DLL_EXPORT true
