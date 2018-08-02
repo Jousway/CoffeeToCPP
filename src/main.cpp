@@ -1,5 +1,7 @@
 #if defined(_WIN32)
 # include "wgl.hpp"
+#else
+# include "glx.hpp"
 #endif
 
 int main()
