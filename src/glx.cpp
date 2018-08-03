@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <tuple>
 #include <map>
 
 #include "glx.hpp"
@@ -31,7 +32,7 @@ static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg ) {
     return (event->type == MapNotify) && (event->xmap.window == (Window) arg);
 }
 
-std::map< std::string, bool > StoredTextures;
+std::map< std::string, std::string > StoredObjects;
 
 void display()
 {
@@ -39,9 +40,8 @@ void display()
 
 	OpenGL OGL;
 
-    for(auto const &CurrentTexture : StoredTextures)
-        if(CurrentTexture.second == true)
-    	    OGL.DrawTexture(CurrentTexture.first);
+    for(auto const &CurrentObject : StoredObjects)
+        OGL.DrawObject(CurrentObject.first, CurrentObject.second);
 
 	glFlush();
 }
@@ -123,34 +123,63 @@ void OpenGL::GLOpenWindow(std::string name, int width, int height, int x, int y)
 
 void OpenGL::AppendTexture(std::string Texture)
 {
-    StoredTextures[Texture] = true;
+    StoredObjects[Texture] = "Image";
 }
 
-void OpenGL::DrawTexture(std::string Texture)
+void OpenGL::AppendQuad(std::string Color)
 {
-	glEnable(GL_TEXTURE_2D);
+    StoredObjects[Color] = "Quad";
+}
 
-	int width, height, components;
-	unsigned char* image = stbi_load(Texture.c_str(), &width, &height, &components, 0);
-	unsigned int texture;
+std::map<std::string, std::tuple<float,float,float>> Colors =
+{
+    {"White", {1.0f, 1.0f, 1.0f}},
+    {"Black", {0.0f, 0.0f, 0.0f}},
+    {"Red",   {1.0f, 0.0f, 0.0f}},
+};
+
+void OpenGL::DrawObject(std::string Object, std::string Type)
+{
+    if(Type == "Image"){
+    	glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND); 
+
+    	int width, height, components;
+    	unsigned char* image = stbi_load(Object.c_str(), &width, &height, &components, 0);
+    	unsigned int texture;
 	
-	if (image == 0)
-		std::cout << stbi_failure_reason();
+    	if (image == 0)
+    		std::cout << stbi_failure_reason();
 
-	glGenTextures(1, &texture); // generate texture object
-	glBindTexture(GL_TEXTURE_2D, texture); // enable our texture object
+    	glGenTextures(1, &texture); // generate texture object
+    	glBindTexture(GL_TEXTURE_2D, texture); // enable our texture object
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 
-	glBegin(GL_QUADS);
-		glTexCoord2d(0, 0); glVertex2f(-1, 1);
-		glTexCoord2d(1, 0); glVertex2f(1, 1);
-		glTexCoord2d(1, 1); glVertex2f(1, -1);
-		glTexCoord2d(0, 1); glVertex2f(-1, -1);
-	glEnd();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	stbi_image_free(image);
+    	glBegin(GL_QUADS);
+    		glTexCoord2d(0, 0); glVertex2f(-1, 1);
+    		glTexCoord2d(1, 0); glVertex2f(1, 1);
+    		glTexCoord2d(1, 1); glVertex2f(1, -1);
+    		glTexCoord2d(0, 1); glVertex2f(-1, -1);
+    	glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+
+	    stbi_image_free(image);
+    }else if(Type == "Quad"){
+        glColor3f(std::get<0>(Colors[Object]), std::get<1>(Colors[Object]), std::get<2>(Colors[Object]));
+
+        glBegin(GL_QUADS);
+    		glTexCoord2d(0, 0); glVertex2f(-1, 1);
+    		glTexCoord2d(1, 0); glVertex2f(1, 1);
+    		glTexCoord2d(1, 1); glVertex2f(1, -1);
+    		glTexCoord2d(0, 1); glVertex2f(-1, -1);
+    	glEnd();
+    }
 }
