@@ -11,6 +11,7 @@ public:
 	void GLOpenWindow(std::string name, int width, int height, int x, int y);
 	void GLCloseWindow();
 	void DrawTexture(std::string Texture);
+    void AppendTexture(std::string Texture);
 };
 
 #endif

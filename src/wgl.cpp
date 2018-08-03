@@ -1,3 +1,5 @@
+#include <map>
+
 #include "wgl.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -9,13 +11,17 @@ int iwidth, iheight, idepth;
 HGLRC hRC;				/* opengl context */
 HWND  hWnd;				/* window */
 
+std::map< std::string, bool > StoredTextures;
+
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	OpenGL OGL;
 
-	OGL.DrawTexture("test.png");
+    for(auto const &CurrentTexture : StoredTextures)
+        if(CurrentTexture.second == true)
+    	    OGL.DrawTexture(CurrentTexture.first);
 
 	glFlush();
 }
@@ -213,6 +219,11 @@ void OpenGL::GLCloseWindow()
 	ReleaseDC(hWnd, hDC);
 	wglDeleteContext(hRC);
 	DestroyWindow(hWnd);
+}
+
+void OpenGL::AppendTexture(std::string Texture)
+{
+    StoredTextures[Texture] = true;
 }
 
 void OpenGL::DrawTexture(std::string Texture)

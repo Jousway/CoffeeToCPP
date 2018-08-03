@@ -8,8 +8,8 @@ int main()
 {	
 	OpenGL OGL;
 	//::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+    OGL.AppendTexture("test.png");
 	OGL.GLOpenWindow("CoffeeToCPP", 640, 480, 0, 0);
-	OGL.DrawTexture("test.png");
 
 	return 0;
 }

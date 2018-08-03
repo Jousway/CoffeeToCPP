@@ -1,20 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <map>
+
 #include "glx.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-void display()
-{
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	OpenGL OGL;
-
-	OGL.DrawTexture("test.png");
-
-	glFlush();
-}
 
 int singleBufferAttributess[] = {
     GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -40,6 +31,20 @@ static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg ) {
     return (event->type == MapNotify) && (event->xmap.window == (Window) arg);
 }
 
+std::map< std::string, bool > StoredTextures;
+
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	OpenGL OGL;
+
+    for(auto const &CurrentTexture : StoredTextures)
+        if(CurrentTexture.second == true)
+    	    OGL.DrawTexture(CurrentTexture.first);
+
+	glFlush();
+}
 
 void OpenGL::GLOpenWindow(std::string name, int width, int height, int x, int y)
 {
@@ -114,6 +119,11 @@ void OpenGL::GLOpenWindow(std::string name, int width, int height, int x, int y)
         XGetWindowAttributes(dpy, xWin, &wa);
         glViewport(0, 0, wa.width, wa.height);
     }
+}
+
+void OpenGL::AppendTexture(std::string Texture)
+{
+    StoredTextures[Texture] = true;
 }
 
 void OpenGL::DrawTexture(std::string Texture)
