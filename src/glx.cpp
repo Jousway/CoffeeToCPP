@@ -1,4 +1,3 @@
-#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include "glx.hpp"
@@ -42,13 +41,14 @@ static Bool WaitForNotify( Display *dpy, XEvent *event, XPointer arg ) {
 }
 
 
-void OpenGL::GLOpenWindow(char* name, int width, int height, int x, int y)
+void OpenGL::GLOpenWindow(std::string name, int width, int height, int x, int y)
 {
     Display              *dpy;
     Window                xWin;
     XEvent                event;
     XVisualInfo          *vInfo;
     XSetWindowAttributes  swa;
+    XWindowAttributes       wa;
     GLXFBConfig          *fbConfigs;
     GLXContext            context;
     GLXWindow             glxWin;
@@ -89,6 +89,8 @@ void OpenGL::GLOpenWindow(char* name, int width, int height, int x, int y)
                           0, vInfo->depth, InputOutput, vInfo->visual,
                           swaMask, &swa );
 
+    XStoreName(dpy, xWin, name.c_str());
+
     /* Create a GLX context for OpenGL rendering */
     context = glXCreateNewContext( dpy, fbConfigs[0], GLX_RGBA_TYPE,
 				 NULL, True );
@@ -109,15 +111,17 @@ void OpenGL::GLOpenWindow(char* name, int width, int height, int x, int y)
         display();
         if ( swapFlag )
             glXSwapBuffers( dpy, glxWin );
+        XGetWindowAttributes(dpy, xWin, &wa);
+        glViewport(0, 0, wa.width, wa.height);
     }
 }
 
-void OpenGL::DrawTexture(char* Texture)
+void OpenGL::DrawTexture(std::string Texture)
 {
 	glEnable(GL_TEXTURE_2D);
 
 	int width, height, components;
-	unsigned char* image = stbi_load(Texture, &width, &height, &components, 0);
+	unsigned char* image = stbi_load(Texture.c_str(), &width, &height, &components, 0);
 	unsigned int texture;
 	
 	if (image == 0)

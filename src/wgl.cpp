@@ -1,4 +1,3 @@
-#include <iostream>
 #include "wgl.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -180,11 +179,11 @@ HWND CreateOpenGLWindow(char* title, int x, int y, int width, int height, BYTE t
 	return hWnd;
 }
 
-void OpenGL::GLOpenWindow(char* name, int width, int height, int x, int y)
+void OpenGL::GLOpenWindow(std::string name, int width, int height, int x, int y)
 {
 	MSG   msg;
 
-	hWnd = CreateOpenGLWindow(name, x, y, width, height,
+	hWnd = CreateOpenGLWindow(name.c_str(), x, y, width, height,
 		PFD_TYPE_RGBA, 0);
 	if (hWnd == NULL)
 		exit(1);
@@ -216,12 +215,12 @@ void OpenGL::GLCloseWindow()
 	DestroyWindow(hWnd);
 }
 
-void OpenGL::DrawTexture(char* Texture)
+void OpenGL::DrawTexture(std::string Texture)
 {
 	glEnable(GL_TEXTURE_2D);
 
 	int width, height, components;
-	unsigned char* image = stbi_load(Texture, &width, &height, &components, 0);
+	unsigned char* image = stbi_load(Texture.c_str(), &width, &height, &components, 0);
 	unsigned int texture;
 	
 	if (image == 0)
