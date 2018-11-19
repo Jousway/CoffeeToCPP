@@ -8,7 +8,7 @@
 class OpenGL
 {
 public:
-	void GLOpenWindow(std::string name, int width, int height, int x, int y);
+	void GLOpenWindow(char *name, int width, int height, int x, int y);
 	void GLCloseWindow();
     void AppendQuad(std::string Color);
     void AppendTexture(std::string Texture);
